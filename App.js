@@ -32,9 +32,14 @@ if (process.env.NODE_ENV !== "development") {
     sessionOptions.cookie = {
       sameSite: "none",
       secure: true,
+      maxAge: 1000 * 60 * 60 * 24,
       domain: process.env.NODE_SERVER_DOMAIN,
     };
 }
+if (process.env.NODE_ENV === "production") {
+    sessionOptions.proxy = true; // Trusting the first proxy
+}
+
 app.use(session(sessionOptions)
 );
       

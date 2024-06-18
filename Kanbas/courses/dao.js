@@ -1,16 +1,9 @@
-import course from "./model.js";
+import model from "./model.js";
 
-export const createCousrse = (course) => {
+export const createCourse = (course) => {
     delete course._id
-    return course.create(course);   
+    return model.create(course);  
 }
-export const findAllCourses = () => course.find();
-export const findCourseById = (courseId) => course.findById(courseIdId);
-export const findUsersByPartialName = (partialName) => {
-    const regex = new RegExp(partialName, "i"); // 'i' makes it case-insensitive
-    return course.find({
-      $or: [{ name: { $regex: regex } }],
-    });
-  };
-export const updateCourse = (courseId, course) =>  course.updateOne({ _id: courseId }, { $set: course });
-export const deleteUser = (courseId) => course.deleteOne({ _id: courseId})
+export const findAllCourses = () => model.find();
+export const updateCourse = (courseId, course) =>  model.updateOne({ _id: courseId }, { $set: course });
+export const deleteCourse = (courseId) => model.deleteOne({ _id: courseId})

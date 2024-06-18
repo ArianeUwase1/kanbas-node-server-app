@@ -5,11 +5,13 @@ export default function UserRoutes(app) {
     res.json(user);
   };
   app.post("/api/users", createUser);
+
   const deleteUser = async (req, res) => {
     const status = await dao.deleteUser(req.params.userId);
       res.json(status);
   };
   app.delete("/api/users/:userId", deleteUser);
+
   const findAllUsers = async (req, res) => {
     const { role, name } = req.query;
     if (role) {
@@ -25,12 +27,14 @@ export default function UserRoutes(app) {
     const users = await dao.findAllUsers();
     res.json(users);
   };
+
   app.get("/api/users", findAllUsers);
   const findUserById = async (req, res) => {
     const user = await dao.findUserById(req.params.userId);
     res.json(user);
    };
    app.get("/api/users/:userId", findUserById);
+
   const updateUser = async (req, res) => {
     const { userId } = req.params;
     const status = await dao.updateUser(userId, req.body);
@@ -49,6 +53,7 @@ export default function UserRoutes(app) {
     }
   };
   app.post("/api/users/signin", signin);
+  
   const profile = async (req, res) => {
     const currentUser = req.session["currentUser"];
     if (!currentUser) {
@@ -57,6 +62,7 @@ export default function UserRoutes(app) {
     }
     res.json(currentUser);
   };
+  
   app.post("/api/users/profile", profile);
 
   const signup = async (req, res) => {
@@ -66,6 +72,7 @@ export default function UserRoutes(app) {
         { message: "Username already taken" });
       return;
     }
+
     const currentUser = await dao.createUser(req.body);
     req.session["currentUser"] = currentUser;
     res.json(currentUser);
