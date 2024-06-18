@@ -1,30 +1,57 @@
-import Database from "../Database/index.js";
+import * as dao from './dao.js';
 
 export default function CourseRoutes(app) {
+  const createCourse = async (req, res) => {
+    try {
+      const course = await dao.createCourse(req.body);
+      res.status(201).json(course);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  };
+  app.post('/api/courses', createCourse);
 
-  app.get("/api/courses", (req, res) => {
-    const courses = Database.courses;
-    res.send(courses);
-  });
-  app.post("/api/courses", (req, res) => {
-    const course = { ...req.body, _id: new Date().getTime().toString() };
-    Database.courses.push(course);
-    res.send(course);
-  });
+  const findAllCourses = async (req, res) => {
+    try {
+      const courses = await dao.findAllCourses();
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  app.get('/api/courses', findAllCourses);
 
-  app.delete("/api/courses/:id", (req, res) => {
-    const { id } = req.params;
-    Database.courses = Database.courses.filter((c) => c._id !== id);
-    res.sendStatus(204);
-  });
-  
-  app.put("/api/courses/:id", (req, res) => {
-    const { id } = req.params;
-    const course = req.body;
-    Database.courses = Database.courses.map((c) =>
-      c._id === id ? { ...c, ...course } : c
-    );
-    res.sendStatus(204);
-  });
+  const findCourseById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const course = await dao.findCourseById(id);
+      res.json(course);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  app.get('/api/courses/:id', findCourseById);
 
+  const updateCourse = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const course = req.body;
+      const status = await dao.updateCourse(id, course);
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  };
+  app.put('/api/courses/:id', updateCourse);
+
+  const deleteCourse = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const status = await dao.deleteCourse(id);
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  app.delete('/api/courses/:id', deleteCourse);
 }
