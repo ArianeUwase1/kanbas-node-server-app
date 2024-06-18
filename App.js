@@ -7,13 +7,38 @@ import ModuleRoutes from "./Kanbas/Modules/routes.js";
 import AssignmentRoutes from "./Kanbas/Assignments/routes.js";
 import cors from "cors";
 import UserRoutes from "./Kanbas/User/routes.js";
+import session from "express-session";
 
 const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/Kanbas";
 mongoose.connect(CONNECTION_STRING);
 const app = express();
-app.use(cors());
+app.use(
+    cors({
+        origin: process.env.NETLIFY_URL || "http://localhost:3000",
+        credentials: true   
+    }));
+const sessionOptions = {
+    secret: process.env.SESSION_SECRET || "Kanbas",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV !== "development", // true in production, false in development
+        httpOnly: true, // Helps prevent cross-site scripting (XSS) attacks
+        sameSite: process.env.NODE_ENV !== "development" ? 'none' : 'lax' // Required for cross-origin cookies
+    }
+};
+if (process.env.NODE_ENV !== "development") {
+    sessionOptions.proxy = true;
+    sessionOptions.cookie = {
+      sameSite: "none",
+      secure: true,
+      domain: process.env.NODE_SERVER_DOMAIN,
+    };
+}
+app.use(session(sessionOptions)
+);
+      
 app.use(express.json()); // Ensure all work is done after this line
-
 
 UserRoutes(app);
 CourseRoutes(app);
