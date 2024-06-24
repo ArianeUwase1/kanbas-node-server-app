@@ -8,6 +8,7 @@ import AssignmentRoutes from "./Kanbas/Assignments/routes.js";
 import cors from "cors";
 import UserRoutes from "./Kanbas/User/routes.js";
 import session from "express-session";
+import EnrollmentRoutes from "./Kanbas/Enrollments/routes.js";
 
 const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/Kanbas";
 mongoose.connect(CONNECTION_STRING);
@@ -45,11 +46,14 @@ app.use(session(sessionOptions)
       
 app.use(express.json()); // Ensure all work is done after this line
 
+
+Lab5(app);
 UserRoutes(app);
 CourseRoutes(app);
 AssignmentRoutes(app);
 ModuleRoutes(app);
-Lab5(app);
+EnrollmentRoutes(app);
+
 
 app.options('*', cors());
 

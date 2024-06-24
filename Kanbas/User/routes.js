@@ -35,11 +35,18 @@ export default function UserRoutes(app) {
    };
    app.get("/api/users/:userId", findUserById);
 
-  const updateUser = async (req, res) => {
-    const { userId } = req.params;
-    const status = await dao.updateUser(userId, req.body);
-    res.json(status);
-   };
+   const updateUser = async (req, res) => {
+    try {
+      const { userId } = req.params;
+      console.log("Backend updateUser - before DAO call:", userId, req.body); // Log user data before DAO call
+      const status = await dao.updateUser(userId, req.body);
+      console.log("Backend updateUser - DAO response:", status); // Log DAO response
+      res.json(status);
+    } catch (error) {
+      console.error("Backend updateUser - error:", error); // Log error
+      res.status(400).json({ message: error.message });
+    }
+  };
   app.put("/api/users/:userId", updateUser);
 
   const signin = async (req, res) => {
@@ -62,21 +69,34 @@ export default function UserRoutes(app) {
     }
     res.json(currentUser);
   };
-  
+
   app.post("/api/users/profile", profile);
 
   const signup = async (req, res) => {
-    const user = await dao.findUserByUsername(req.body.username);
-    if (user) {
-      res.status(400).json(
-        { message: "Username already taken" });
-      return;
-    }
+    try {
+      console.log("Received request body:", req.body); // Log received request body
+      const user = await dao.findUserByUsername(req.body.username);
+      if (user) {
+        res.status(400).json({ message: "Username already taken" });
+        return;
+      }
 
-    const currentUser = await dao.createUser(req.body);
-    req.session["currentUser"] = currentUser;
-    res.json(currentUser);
+      // Normalize role to uppercase
+      const newUser = {
+        ...req.body,
+        role: req.body.role.toUpperCase(), // Convert role to uppercase
+      };
+
+      console.log("Before creating user in DB:", newUser); // Log before creating user
+      const currentUser = await dao.createUser(newUser);
+      req.session["currentUser"] = currentUser;
+      res.json(currentUser);
+    } catch (error) {
+      console.error("Error in signup route:", error); // Log error
+      res.status(400).json({ message: error.message });
+    }
   };
+
   app.post("/api/users/signup", signup);
 
   const signout = (req, res) => {

@@ -7,3 +7,6 @@ export const createCourse = (course) => {
 export const findAllCourses = () => model.find();
 export const updateCourse = (courseId, course) =>  model.updateOne({ _id: courseId }, { $set: course });
 export const deleteCourse = (courseId) => model.deleteOne({ _id: courseId})
+export function findCoursesByAuthor(author) {
+    return model.find({author});
+}
